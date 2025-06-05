@@ -18,12 +18,40 @@ async function fetchWorkflows(): Promise<Workflow[]> {
     return resp.json();
 }
 
+// Case model
+interface CaseStep {
+    id: string;
+    completed: boolean;
+    completedDate?: string;
+}
+interface Case {
+    id: string;
+    workflowId: string;
+    startedDate: string;
+    steps: CaseStep[];
+    finished: boolean;
+    finishedDate?: string;
+}
+
+function createCaseFromWorkflow(workflow: Workflow): Case {
+    return {
+        id: `${workflow.id}-${Date.now()}`,
+        workflowId: workflow.id,
+        startedDate: new Date().toISOString(),
+        steps: workflow.steps.map(step => ({ id: step.id, completed: false })),
+        finished: false,
+    };
+}
+
 export default function WorkflowWizard() {
     const [workflows, setWorkflows] = useState<Workflow[]>([]);
     const [selectedWorkflowId, setSelectedWorkflowId] = useState<string>('');
+    const [cases, setCases] = useState<Case[]>([]);
+    const [activeCaseId, setActiveCaseId] = useState<string | null>(null);
     const [currentStep, setCurrentStep] = useState(0);
     const [finished, setFinished] = useState(false);
     const selectedWorkflow = workflows.find(w => w.id === selectedWorkflowId);
+    const activeCase = cases.find(c => c.id === activeCaseId);
 
     useEffect(() => {
         fetchWorkflows().then(setWorkflows).catch(() => setWorkflows([]));
@@ -32,22 +60,47 @@ export default function WorkflowWizard() {
     useEffect(() => {
         setCurrentStep(0);
         setFinished(false);
+        setActiveCaseId(null);
     }, [selectedWorkflowId]);
 
-    const handleFinish = () => {
+    const handleCreateCase = () => {
         if (selectedWorkflow) {
-            const updatedWorkflows = workflows.map(w => {
-                if (w.id === selectedWorkflow.id) {
-                    const steps = w.steps.map((step, idx) =>
-                        idx === w.steps.length - 1 ? { ...step, completed: true, completedDate: new Date().toISOString() } : step
-                    );
-                    return { ...w, steps };
-                }
-                return w;
-            });
-            setWorkflows(updatedWorkflows);
-            setCurrentStep(selectedWorkflow.steps.length);
+            const newCase = createCaseFromWorkflow(selectedWorkflow);
+            setCases(prev => [...prev, newCase]);
+            setActiveCaseId(newCase.id);
+            setCurrentStep(0);
+            setFinished(false);
         }
+    };
+
+    const handleStepChange = (nextStep: number) => {
+        if (!activeCase) return;
+        setCases(prevCases => prevCases.map(c => {
+            if (c.id !== activeCase.id) return c;
+            const steps = c.steps.map((s, idx) => {
+                if (idx === currentStep && nextStep > currentStep) {
+                    // Mark as complete if moving forward
+                    return { ...s, completed: true, completedDate: s.completed ? s.completedDate : new Date().toISOString() };
+                } else if (idx === currentStep && nextStep < currentStep) {
+                    // Unmark as complete if moving back
+                    return { ...s, completed: false, completedDate: undefined };
+                }
+                return s;
+            });
+            return { ...c, steps };
+        }));
+        setCurrentStep(nextStep);
+    };
+
+    const handleFinish = () => {
+        if (!activeCase) return;
+        setCases(prevCases => prevCases.map(c => {
+            if (c.id !== activeCase.id) return c;
+            const steps = c.steps.map((s, idx) =>
+                idx === c.steps.length - 1 ? { ...s, completed: true, completedDate: s.completedDate || new Date().toISOString() } : s
+            );
+            return { ...c, steps, finished: true, finishedDate: new Date().toISOString() };
+        }));
         setFinished(true);
     };
 
@@ -68,13 +121,18 @@ export default function WorkflowWizard() {
                     ))}
                 </Select>
             </FormControl>
-            {selectedWorkflow && (
+            {selectedWorkflow && !activeCase && (
+                <Button variant="contained" color="primary" onClick={handleCreateCase} sx={{ mb: 3 }}>
+                    Start New Case
+                </Button>
+            )}
+            {selectedWorkflow && activeCase && (
                 <Box>
-                    <Typography variant="h5" gutterBottom>{selectedWorkflow.name}</Typography>
+                    <Typography variant="h5" gutterBottom>{selectedWorkflow.name} (Case: {activeCase.id})</Typography>
                     <Typography variant="body1" sx={{ mb: 2 }}>{selectedWorkflow.description}</Typography>
                     <Stepper activeStep={currentStep} alternativeLabel sx={{ mb: 3 }}>
-                        {selectedWorkflow.steps.map((step) => (
-                            <Step key={step.id}>
+                        {selectedWorkflow.steps.map((step, idx) => (
+                            <Step key={step.id} completed={!!activeCase.steps[idx]?.completed}>
                                 <StepLabel>{step.actor}</StepLabel>
                             </Step>
                         ))}
@@ -84,16 +142,16 @@ export default function WorkflowWizard() {
                             <Box sx={{ p: 2, mb: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
                                 <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>{selectedWorkflow.steps[currentStep].actor}:</Typography>
                                 <Typography variant="body1">{selectedWorkflow.steps[currentStep].description}</Typography>
-                                {currentStep === selectedWorkflow.steps.length - 1 && selectedWorkflow.steps[currentStep].completed && (
+                                {activeCase.steps[currentStep]?.completed && (
                                     <Typography variant="body2" color="success.main" sx={{ mt: 1 }}>
-                                        Step marked as complete on {selectedWorkflow.steps[currentStep].completedDate ? new Date(selectedWorkflow.steps[currentStep].completedDate).toLocaleString() : ''}
+                                        Step marked as complete{activeCase.steps[currentStep].completedDate ? ` on ${new Date(activeCase.steps[currentStep].completedDate!).toLocaleString()}` : ''}
                                     </Typography>
                                 )}
                             </Box>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                 <Button
                                     variant="contained"
-                                    onClick={() => setCurrentStep(s => Math.max(0, s - 1))}
+                                    onClick={() => handleStepChange(currentStep - 1)}
                                     disabled={currentStep === 0}
                                 >Previous</Button>
                                 <Typography variant="body2" sx={{ alignSelf: 'center' }}>
@@ -108,7 +166,7 @@ export default function WorkflowWizard() {
                                 ) : (
                                     <Button
                                         variant="contained"
-                                        onClick={() => setCurrentStep(s => Math.min(selectedWorkflow.steps.length - 1, s + 1))}
+                                        onClick={() => handleStepChange(currentStep + 1)}
                                     >Next</Button>
                                 )}
                             </Box>
@@ -116,13 +174,13 @@ export default function WorkflowWizard() {
                     ) : (
                         <Box sx={{ mt: 4, textAlign: 'center' }}>
                             <Typography variant="h5" color="success.main" gutterBottom>
-                                Workflow Complete!
+                                Case Complete!
                             </Typography>
                             <Typography variant="body1">
-                                You have finished all steps for this workflow.
+                                You have finished all steps for this case.
                             </Typography>
                             <Typography variant="body2" sx={{ mt: 1 }}>
-                                Completed on {new Date(selectedWorkflow.completedDate || new Date().toISOString()).toLocaleString()}
+                                Completed on {activeCase.finishedDate ? new Date(activeCase.finishedDate).toLocaleString() : ''}
                             </Typography>
                         </Box>
                     )}
