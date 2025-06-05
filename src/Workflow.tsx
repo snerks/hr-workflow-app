@@ -77,7 +77,13 @@ export default function WorkflowWizard() {
             setActiveCaseId(newCase.id);
             setCurrentStep(0);
             setFinished(false);
-            setAuditLog([]);
+            setAuditLog([
+                {
+                    stepId: selectedWorkflow.steps[0].id,
+                    stepIndex: 0,
+                    timestamp: new Date().toISOString(),
+                },
+            ]);
         }
     };
 
@@ -117,6 +123,14 @@ export default function WorkflowWizard() {
             );
             return { ...c, steps, finished: true, finishedDate: new Date().toISOString() };
         }));
+        setAuditLog(prev => [
+            ...prev,
+            {
+                stepId: 'WORKFLOW_FINISHED',
+                stepIndex: currentStep,
+                timestamp: new Date().toISOString(),
+            },
+        ]);
         setFinished(true);
     };
 
@@ -144,7 +158,8 @@ export default function WorkflowWizard() {
             )}
             {selectedWorkflow && activeCase && (
                 <Box>
-                    <Typography variant="h5" gutterBottom>{selectedWorkflow.name} (Case: {activeCase.id})</Typography>
+                    <Typography variant="h5" gutterBottom>{selectedWorkflow.name}</Typography>
+                    <Typography variant="h6" gutterBottom>(Case Id: {activeCase.id})</Typography>
                     <Typography variant="body1" sx={{ mb: 2 }}>{selectedWorkflow.description}</Typography>
                     <Stepper activeStep={currentStep} alternativeLabel sx={{ mb: 3 }}>
                         {selectedWorkflow.steps.map((step, idx) => (
@@ -162,7 +177,9 @@ export default function WorkflowWizard() {
                                 {auditLog.map((entry, idx) => (
                                     <li key={idx}>
                                         <Typography variant="body2">
-                                            {`Visited step ${entry.stepIndex + 1} (${selectedWorkflow.steps[entry.stepIndex].actor}: ${selectedWorkflow.steps[entry.stepIndex].description.slice(0, 40)}...) at ${new Date(entry.timestamp).toLocaleString()}`}
+                                            {entry.stepId === 'WORKFLOW_FINISHED'
+                                                ? `Workflow finished at ${new Date(entry.timestamp).toLocaleString()}`
+                                                : `Visited step ${entry.stepIndex + 1} (${selectedWorkflow.steps[entry.stepIndex].actor}: ${selectedWorkflow.steps[entry.stepIndex].description.slice(0, 40)}...) at ${new Date(entry.timestamp).toLocaleString()}`}
                                         </Typography>
                                     </li>
                                 ))}
