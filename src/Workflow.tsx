@@ -154,7 +154,7 @@ export default function WorkflowWizard() {
             <Box sx={{ maxWidth: 700, mx: 'auto', mt: 4, p: 3, bgcolor: 'background.paper', borderRadius: 2, boxShadow: 2 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
                     <Typography variant="h4" gutterBottom sx={darkMode ? { color: '#fff' } : {}}>
-                        HR Workflow App
+                        HR Workflow
                     </Typography>
                     <FormControlLabel
                         control={<Switch checked={darkMode} onChange={() => setDarkMode(v => !v)} color="primary" />}
