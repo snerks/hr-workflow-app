@@ -32,6 +32,11 @@ interface Case {
     finished: boolean;
     finishedDate?: string;
 }
+interface AuditEntry {
+    stepId: string;
+    stepIndex: number;
+    timestamp: string;
+}
 
 function createCaseFromWorkflow(workflow: Workflow): Case {
     return {
@@ -50,6 +55,7 @@ export default function WorkflowWizard() {
     const [activeCaseId, setActiveCaseId] = useState<string | null>(null);
     const [currentStep, setCurrentStep] = useState(0);
     const [finished, setFinished] = useState(false);
+    const [auditLog, setAuditLog] = useState<AuditEntry[]>([]);
     const selectedWorkflow = workflows.find(w => w.id === selectedWorkflowId);
     const activeCase = cases.find(c => c.id === activeCaseId);
 
@@ -61,6 +67,7 @@ export default function WorkflowWizard() {
         setCurrentStep(0);
         setFinished(false);
         setActiveCaseId(null);
+        setAuditLog([]);
     }, [selectedWorkflowId]);
 
     const handleCreateCase = () => {
@@ -70,11 +77,12 @@ export default function WorkflowWizard() {
             setActiveCaseId(newCase.id);
             setCurrentStep(0);
             setFinished(false);
+            setAuditLog([]);
         }
     };
 
     const handleStepChange = (nextStep: number) => {
-        if (!activeCase) return;
+        if (!activeCase || !selectedWorkflow) return;
         setCases(prevCases => prevCases.map(c => {
             if (c.id !== activeCase.id) return c;
             const steps = c.steps.map((s, idx) => {
@@ -89,6 +97,14 @@ export default function WorkflowWizard() {
             });
             return { ...c, steps };
         }));
+        setAuditLog(prev => [
+            ...prev,
+            {
+                stepId: selectedWorkflow.steps[nextStep].id,
+                stepIndex: nextStep,
+                timestamp: new Date().toISOString(),
+            },
+        ]);
         setCurrentStep(nextStep);
     };
 
@@ -137,6 +153,22 @@ export default function WorkflowWizard() {
                             </Step>
                         ))}
                     </Stepper>
+                    <Typography variant="h6" sx={{ mt: 4, mb: 1 }}>Audit Log</Typography>
+                    <Box sx={{ bgcolor: 'grey.50', borderRadius: 1, p: 2, mb: 2, maxHeight: 200, overflow: 'auto' }}>
+                        {auditLog.length === 0 ? (
+                            <Typography variant="body2" color="text.secondary">No steps visited yet.</Typography>
+                        ) : (
+                            <ul style={{ margin: 0, paddingLeft: 16 }}>
+                                {auditLog.map((entry, idx) => (
+                                    <li key={idx}>
+                                        <Typography variant="body2">
+                                            {`Visited step ${entry.stepIndex + 1} (${selectedWorkflow.steps[entry.stepIndex].actor}: ${selectedWorkflow.steps[entry.stepIndex].description.slice(0, 40)}...) at ${new Date(entry.timestamp).toLocaleString()}`}
+                                        </Typography>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </Box>
                     {!finished ? (
                         <>
                             <Box sx={{ p: 2, mb: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
