@@ -8,12 +8,15 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Button from '@mui/material/Button';
 import Stepper from '@mui/material/Stepper';
+import MobileStepper from '@mui/material/MobileStepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Switch from '@mui/material/Switch';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import workflowDefinitions from './workflows.json';
 
 // Case model
@@ -184,46 +187,114 @@ export default function WorkflowWizard() {
                         <Typography variant="caption" gutterBottom sx={darkMode ? { color: '#fff' } : {}}>Case Id: {activeCase.id}</Typography>
                         <Typography variant="h5" gutterBottom sx={darkMode ? { color: '#fff' } : {}}>{selectedWorkflow.name}</Typography>
                         <Typography variant="body1" sx={{ mb: 2, ...(darkMode ? { color: '#fff' } : {}) }}>{selectedWorkflow.description}</Typography>
-                        <Stepper activeStep={currentStep} orientation={isMobile ? 'vertical' : 'horizontal'} alternativeLabel={!isMobile} sx={{ mb: 3 }}>
-                            {selectedWorkflow.steps.map((step, idx) => (
-                                <Step key={step.id} completed={!!activeCase.steps[idx]?.completed}>
-                                    <StepLabel>{step.actor}</StepLabel>
-                                </Step>
-                            ))}
-                        </Stepper>
+                        {isMobile ? (
+                            <Box sx={{ maxWidth: 400, width: '100%', mx: 'auto' }}>
+                                <MobileStepper
+                                    variant="progress"
+                                    steps={selectedWorkflow.steps.length}
+                                    position="static"
+                                    activeStep={currentStep}
+                                    sx={{
+                                        flexGrow: 1,
+                                        mb: 3,
+                                        bgcolor: darkMode ? 'grey.900' : 'grey.100'
+                                    }}
+                                    LinearProgressProps={{
+                                        sx: {
+                                            '& .MuiLinearProgress-bar': {
+                                                bgcolor: activeCase.steps[currentStep]?.completed ? 'success.main' : 'primary.main'
+                                            }
+                                        }
+                                    }}
+                                    backButton={
+                                        <Button
+                                            size="small"
+                                            onClick={() => handleStepChange(currentStep - 1)}
+                                            disabled={currentStep === 0}
+                                            sx={darkMode ? { color: '#fff' } : {}}
+                                        >
+                                            <KeyboardArrowLeft />
+                                            Back
+                                        </Button>
+                                    }
+                                    nextButton={
+                                        <Button
+                                            size="small"
+                                            onClick={() => currentStep === selectedWorkflow.steps.length - 1
+                                                ? handleFinish()
+                                                : handleStepChange(currentStep + 1)
+                                            }
+                                            sx={darkMode ? { color: '#fff' } : {}}
+                                        >
+                                            {currentStep === selectedWorkflow.steps.length - 1 ? 'Finish' : 'Next'}
+                                            <KeyboardArrowRight />
+                                        </Button>
+                                    }
+                                />
+                                <Typography variant="body2" sx={{ textAlign: 'center', mb: 2, ...(darkMode ? { color: '#fff' } : {}) }}>
+                                    {selectedWorkflow.steps[currentStep].actor}: Step {currentStep + 1} of {selectedWorkflow.steps.length}
+                                </Typography>
+                            </Box>
+                        ) : (
+                            <Stepper activeStep={currentStep} alternativeLabel sx={{ mb: 3 }}>
+                                {selectedWorkflow.steps.map((step, idx) => (
+                                    <Step key={step.id} completed={!!activeCase.steps[idx]?.completed}>
+                                        <StepLabel>{step.actor}</StepLabel>
+                                    </Step>
+                                ))}
+                            </Stepper>
+                        )}
+
                         {!finished ? (
                             <>
-                                <Box sx={{ p: 2, mb: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>{selectedWorkflow.steps[currentStep].actor}:</Typography>
-                                    <Typography variant="body1">{selectedWorkflow.steps[currentStep].description}</Typography>
+                                <Box sx={{ p: 2, mb: 2, bgcolor: darkMode ? 'grey.900' : 'grey.100', borderRadius: 1 }}>
+                                    <Typography variant="subtitle1" sx={{ fontWeight: 600, ...(darkMode ? { color: '#fff' } : {}) }}>
+                                        {selectedWorkflow.steps[currentStep].actor}:
+                                    </Typography>
+                                    <Typography variant="body1" sx={darkMode ? { color: '#fff' } : {}}>
+                                        {selectedWorkflow.steps[currentStep].description}
+                                    </Typography>
                                     {activeCase.steps[currentStep]?.completed && (
                                         <Typography variant="body2" color="success.main" sx={{ mt: 1 }}>
-                                            Step marked as complete{activeCase.steps[currentStep].completedDate ? ` on ${new Date(activeCase.steps[currentStep].completedDate!).toLocaleString()}` : ''}
+                                            Step marked as complete{activeCase.steps[currentStep].completedDate
+                                                ? ` on ${new Date(activeCase.steps[currentStep].completedDate!).toLocaleString()}`
+                                                : ''}
                                         </Typography>
                                     )}
                                 </Box>
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                    <Button
-                                        variant="contained"
-                                        onClick={() => handleStepChange(currentStep - 1)}
-                                        disabled={currentStep === 0}
-                                    >Previous</Button>
-                                    <Typography variant="body2" sx={{ alignSelf: 'center', ...(darkMode ? { color: '#fff' } : {}) }}>
-                                        Step {currentStep + 1} of {selectedWorkflow.steps.length}
-                                    </Typography>
-                                    {currentStep === selectedWorkflow.steps.length - 1 ? (
+                                {!isMobile && (
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                         <Button
                                             variant="contained"
-                                            color="success"
-                                            onClick={handleFinish}
-                                        >Finish</Button>
-                                    ) : (
-                                        <Button
-                                            variant="contained"
-                                            onClick={() => handleStepChange(currentStep + 1)}
-                                        >Next</Button>
-                                    )}
-                                </Box>
+                                            onClick={() => handleStepChange(currentStep - 1)}
+                                            disabled={currentStep === 0}
+                                            startIcon={<KeyboardArrowLeft />}
+                                        >
+                                            Previous
+                                        </Button>
+                                        <Typography variant="body2" sx={{ ...(darkMode ? { color: '#fff' } : {}) }}>
+                                            Step {currentStep + 1} of {selectedWorkflow.steps.length}
+                                        </Typography>
+                                        {currentStep === selectedWorkflow.steps.length - 1 ? (
+                                            <Button
+                                                variant="contained"
+                                                color="success"
+                                                onClick={handleFinish}
+                                                endIcon={<KeyboardArrowRight />}
+                                            >
+                                                Finish
+                                            </Button>
+                                        ) : (
+                                            <Button
+                                                variant="contained"
+                                                onClick={() => handleStepChange(currentStep + 1)}
+                                                endIcon={<KeyboardArrowRight />}
+                                            >
+                                                Next
+                                            </Button>
+                                        )}
+                                    </Box>
+                                )}
                             </>
                         ) : (
                             <Box sx={{ mt: 4, textAlign: 'center' }}>
