@@ -64,6 +64,13 @@ export default function WorkflowWizard() {
         palette: {
             mode: darkMode ? 'dark' : 'light',
         },
+        components: {
+            MuiTypography: {
+                styleOverrides: {
+                    h4: darkMode ? { color: '#fff' } : {},
+                },
+            },
+        },
     });
     const selectedWorkflow = workflows.find(w => w.id === selectedWorkflowId);
     const activeCase = cases.find(c => c.id === activeCaseId);
@@ -147,12 +154,14 @@ export default function WorkflowWizard() {
         <ThemeProvider theme={theme}>
             <Box sx={{ maxWidth: 700, mx: 'auto', mt: 4, p: 3, bgcolor: 'background.paper', borderRadius: 2, boxShadow: 2 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-                    <Typography variant="h4" gutterBottom>HR Workflow Wizard</Typography>
+                    <Typography variant="h4" gutterBottom sx={darkMode ? { color: '#fff' } : {}}>
+                        HR Workflow Wizard
+                    </Typography>
                     <FormControlLabel
                         control={<Switch checked={darkMode} onChange={() => setDarkMode(v => !v)} color="primary" />}
                         label={darkMode ? 'Dark' : 'Light'}
                         labelPlacement="start"
-                        sx={{ ml: 2 }}
+                        sx={{ ml: 2, ...(darkMode ? { color: '#fff' } : {}) }}
                     />
                 </Box>
                 <FormControl fullWidth sx={{ mb: 3 }}>
@@ -176,9 +185,9 @@ export default function WorkflowWizard() {
                 )}
                 {selectedWorkflow && activeCase && (
                     <Box>
-                        <Typography variant="h6" gutterBottom>Case Id: {activeCase.id}</Typography>
-                        <Typography variant="h5" gutterBottom>{selectedWorkflow.name}</Typography>
-                        <Typography variant="body1" sx={{ mb: 2 }}>{selectedWorkflow.description}</Typography>
+                        <Typography variant="caption" gutterBottom sx={darkMode ? { color: '#fff' } : {}}>Case Id: {activeCase.id}</Typography>
+                        <Typography variant="h5" gutterBottom sx={darkMode ? { color: '#fff' } : {}}>{selectedWorkflow.name}</Typography>
+                        <Typography variant="body1" sx={{ mb: 2, ...(darkMode ? { color: '#fff' } : {}) }}>{selectedWorkflow.description}</Typography>
                         <Stepper activeStep={currentStep} alternativeLabel sx={{ mb: 3 }}>
                             {selectedWorkflow.steps.map((step, idx) => (
                                 <Step key={step.id} completed={!!activeCase.steps[idx]?.completed}>
@@ -204,7 +213,7 @@ export default function WorkflowWizard() {
                                         onClick={() => handleStepChange(currentStep - 1)}
                                         disabled={currentStep === 0}
                                     >Previous</Button>
-                                    <Typography variant="body2" sx={{ alignSelf: 'center' }}>
+                                    <Typography variant="body2" sx={{ alignSelf: 'center', ...(darkMode ? { color: '#fff' } : {}) }}>
                                         Step {currentStep + 1} of {selectedWorkflow.steps.length}
                                     </Typography>
                                     {currentStep === selectedWorkflow.steps.length - 1 ? (
@@ -226,15 +235,15 @@ export default function WorkflowWizard() {
                                 <Typography variant="h5" color="success.main" gutterBottom>
                                     Case Complete!
                                 </Typography>
-                                <Typography variant="body1">
+                                <Typography variant="body1" sx={{ ...(darkMode ? { color: '#fff' } : {}) }}>
                                     You have finished all steps for this case.
                                 </Typography>
-                                <Typography variant="body2" sx={{ mt: 1 }}>
+                                <Typography variant="body2" sx={{ mt: 1, ...(darkMode ? { color: '#fff' } : {}) }}>
                                     Completed on {activeCase.finishedDate ? new Date(activeCase.finishedDate).toLocaleString() : ''}
                                 </Typography>
                             </Box>
                         )}
-                        <Typography variant="h6" sx={{ mt: 4, mb: 1 }}>Audit Log</Typography>
+                        <Typography variant="h6" sx={{ mt: 4, mb: 1, ...(darkMode ? { color: '#fff' } : {}) }}>Audit Log</Typography>
                         <Box sx={{ bgcolor: 'grey.50', borderRadius: 1, p: 2, mb: 2, maxHeight: 200, overflow: 'auto' }}>
                             {auditLog.length === 0 ? (
                                 <Typography variant="body2" color="text.secondary">No steps visited yet.</Typography>
