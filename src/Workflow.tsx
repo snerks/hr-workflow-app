@@ -1,6 +1,15 @@
 import { useState, useEffect } from 'react';
-import './Workflow.css';
 import type { Workflow } from './models';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Button from '@mui/material/Button';
+import Stepper from '@mui/material/Stepper';
+import Step from '@mui/material/Step';
+import StepLabel from '@mui/material/StepLabel';
 
 // Helper to load workflows from JSON
 async function fetchWorkflows(): Promise<Workflow[]> {
@@ -24,42 +33,54 @@ export default function WorkflowWizard() {
     }, [selectedWorkflowId]);
 
     return (
-        <div className="workflow-container">
-            <h2>HR Workflow Wizard</h2>
-            <label>
-                Select Workflow:{' '}
-                <select
+        <Box sx={{ maxWidth: 700, mx: 'auto', mt: 4, p: 3, bgcolor: 'background.paper', borderRadius: 2, boxShadow: 2 }}>
+            <Typography variant="h4" gutterBottom>HR Workflow Wizard</Typography>
+            <FormControl fullWidth sx={{ mb: 3 }}>
+                <InputLabel id="workflow-select-label">Select Workflow</InputLabel>
+                <Select
+                    labelId="workflow-select-label"
                     value={selectedWorkflowId}
+                    label="Select Workflow"
                     onChange={e => setSelectedWorkflowId(e.target.value)}
                 >
-                    <option value="">-- Choose --</option>
+                    <MenuItem value="">-- Choose --</MenuItem>
                     {workflows.map(w => (
-                        <option key={w.id} value={w.id}>{w.name}</option>
+                        <MenuItem key={w.id} value={w.id}>{w.name}</MenuItem>
                     ))}
-                </select>
-            </label>
+                </Select>
+            </FormControl>
             {selectedWorkflow && (
-                <div className="wizard">
-                    <h3>{selectedWorkflow.name}</h3>
-                    <p>{selectedWorkflow.description}</p>
-                    <div className="wizard-step">
-                        <div className={`workflow-step workflow-step-${selectedWorkflow.steps[currentStep].actor.toLowerCase()}`}>
-                            <strong>{selectedWorkflow.steps[currentStep].actor}:</strong> {selectedWorkflow.steps[currentStep].description}
-                        </div>
-                        <div className="wizard-controls">
-                            <button
-                                onClick={() => setCurrentStep(s => Math.max(0, s - 1))}
-                                disabled={currentStep === 0}
-                            >Previous</button>
-                            <span> Step {currentStep + 1} of {selectedWorkflow.steps.length} </span>
-                            <button
-                                onClick={() => setCurrentStep(s => Math.min(selectedWorkflow.steps.length - 1, s + 1))}
-                                disabled={currentStep === selectedWorkflow.steps.length - 1}
-                            >Next</button>
-                        </div>
-                    </div>
-                </div>
+                <Box>
+                    <Typography variant="h5" gutterBottom>{selectedWorkflow.name}</Typography>
+                    <Typography variant="body1" sx={{ mb: 2 }}>{selectedWorkflow.description}</Typography>
+                    <Stepper activeStep={currentStep} alternativeLabel sx={{ mb: 3 }}>
+                        {selectedWorkflow.steps.map((step, idx) => (
+                            <Step key={step.id}>
+                                <StepLabel>{step.actor}</StepLabel>
+                            </Step>
+                        ))}
+                    </Stepper>
+                    <Box sx={{ p: 2, mb: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>{selectedWorkflow.steps[currentStep].actor}:</Typography>
+                        <Typography variant="body1">{selectedWorkflow.steps[currentStep].description}</Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Button
+                            variant="contained"
+                            onClick={() => setCurrentStep(s => Math.max(0, s - 1))}
+                            disabled={currentStep === 0}
+                        >Previous</Button>
+                        <Typography variant="body2" sx={{ alignSelf: 'center' }}>
+                            Step {currentStep + 1} of {selectedWorkflow.steps.length}
+                        </Typography>
+                        <Button
+                            variant="contained"
+                            onClick={() => setCurrentStep(s => Math.min(selectedWorkflow.steps.length - 1, s + 1))}
+                            disabled={currentStep === selectedWorkflow.steps.length - 1}
+                        >Next</Button>
+                    </Box>
+                </Box>
             )}
-        </div>
+        </Box>
     );
 }
