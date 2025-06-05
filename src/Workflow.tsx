@@ -158,8 +158,8 @@ export default function WorkflowWizard() {
             )}
             {selectedWorkflow && activeCase && (
                 <Box>
+                    <Typography variant="h6" gutterBottom>Case Id: {activeCase.id}</Typography>
                     <Typography variant="h5" gutterBottom>{selectedWorkflow.name}</Typography>
-                    <Typography variant="h6" gutterBottom>(Case Id: {activeCase.id})</Typography>
                     <Typography variant="body1" sx={{ mb: 2 }}>{selectedWorkflow.description}</Typography>
                     <Stepper activeStep={currentStep} alternativeLabel sx={{ mb: 3 }}>
                         {selectedWorkflow.steps.map((step, idx) => (

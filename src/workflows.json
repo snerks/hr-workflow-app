@@ -135,5 +135,49 @@
                 "description": "Inform employee of their right to appeal and process any appeal in line with company policy."
             }
         ]
+    },
+    {
+        "id": "promotion",
+        "name": "Promotion",
+        "description": "Process for managing employee promotions in compliance with UK employment law.",
+        "createdDate": "2025-06-05T09:00:00Z",
+        "dueDate": "2025-12-01T00:00:00Z",
+        "steps": [
+            {
+                "id": "identify-candidate",
+                "actor": "Employer",
+                "description": "Identify potential candidate(s) for promotion based on performance, skills, and business needs."
+            },
+            {
+                "id": "review-eligibility",
+                "actor": "Employer",
+                "description": "Review eligibility and ensure compliance with equal opportunity and anti-discrimination laws."
+            },
+            {
+                "id": "conduct-assessment",
+                "actor": "Employer",
+                "description": "Conduct assessment/interview or evaluation process as per company policy."
+            },
+            {
+                "id": "make-offer",
+                "actor": "Employer",
+                "description": "Make formal promotion offer to selected employee, including new terms and conditions."
+            },
+            {
+                "id": "employee-accepts",
+                "actor": "Worker",
+                "description": "Employee reviews and accepts promotion offer in writing."
+            },
+            {
+                "id": "update-records-promotion",
+                "actor": "Employer",
+                "description": "Update HR and payroll records to reflect new role, salary, and benefits."
+            },
+            {
+                "id": "onboarding-promotion",
+                "actor": "Employer",
+                "description": "Arrange onboarding/training for new role and communicate changes to relevant teams."
+            }
+        ]
     }
 ]
