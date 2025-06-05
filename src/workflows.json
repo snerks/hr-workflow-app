@@ -91,5 +91,49 @@
                 "description": "Support return-to-work planning and ensure compliance with UK employment law."
             }
         ]
+    },
+    {
+        "id": "gross-misconduct",
+        "name": "Gross Misconduct",
+        "description": "Process for handling allegations of gross misconduct in compliance with UK employment law.",
+        "createdDate": "2025-06-05T09:00:00Z",
+        "dueDate": "2025-12-01T00:00:00Z",
+        "steps": [
+            {
+                "id": "allegation-raised",
+                "actor": "Employer",
+                "description": "Allegation of gross misconduct is raised and documented."
+            },
+            {
+                "id": "suspend-employee",
+                "actor": "Employer",
+                "description": "Suspend employee on full pay pending investigation (if appropriate)."
+            },
+            {
+                "id": "investigation",
+                "actor": "Employer",
+                "description": "Conduct a thorough and fair investigation, gathering evidence and interviewing relevant parties."
+            },
+            {
+                "id": "invite-disciplinary-hearing",
+                "actor": "Employer",
+                "description": "Invite employee to a disciplinary hearing, providing details of the allegations and evidence."
+            },
+            {
+                "id": "disciplinary-hearing",
+                "actor": "Employer",
+                "description": "Hold disciplinary hearing, allowing employee to respond and be accompanied if desired."
+            },
+            {
+                "id": "decision",
+                "actor": "Employer",
+                "description": "Decide on outcome (e.g., summary dismissal, warning, or no action) and communicate decision in writing."
+            },
+            {
+                "id": "right-of-appeal",
+                "actor": "Worker",
+                "description": "Inform employee of their right to appeal and process any appeal in line with company policy."
+            }
+        ]
     }
 ]

@@ -168,24 +168,7 @@ export default function WorkflowWizard() {
                             </Step>
                         ))}
                     </Stepper>
-                    <Typography variant="h6" sx={{ mt: 4, mb: 1 }}>Audit Log</Typography>
-                    <Box sx={{ bgcolor: 'grey.50', borderRadius: 1, p: 2, mb: 2, maxHeight: 200, overflow: 'auto' }}>
-                        {auditLog.length === 0 ? (
-                            <Typography variant="body2" color="text.secondary">No steps visited yet.</Typography>
-                        ) : (
-                            <ul style={{ margin: 0, paddingLeft: 16 }}>
-                                {auditLog.map((entry, idx) => (
-                                    <li key={idx}>
-                                        <Typography variant="body2">
-                                            {entry.stepId === 'WORKFLOW_FINISHED'
-                                                ? `Workflow finished at ${new Date(entry.timestamp).toLocaleString()}`
-                                                : `Visited step ${entry.stepIndex + 1} (${selectedWorkflow.steps[entry.stepIndex].actor}: ${selectedWorkflow.steps[entry.stepIndex].description.slice(0, 40)}...) at ${new Date(entry.timestamp).toLocaleString()}`}
-                                        </Typography>
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                    </Box>
+
                     {!finished ? (
                         <>
                             <Box sx={{ p: 2, mb: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
@@ -233,6 +216,24 @@ export default function WorkflowWizard() {
                             </Typography>
                         </Box>
                     )}
+                    <Typography variant="h6" sx={{ mt: 4, mb: 1 }}>Audit Log</Typography>
+                    <Box sx={{ bgcolor: 'grey.50', borderRadius: 1, p: 2, mb: 2, maxHeight: 200, overflow: 'auto' }}>
+                        {auditLog.length === 0 ? (
+                            <Typography variant="body2" color="text.secondary">No steps visited yet.</Typography>
+                        ) : (
+                            <ul style={{ margin: 0, paddingLeft: 16 }}>
+                                {auditLog.map((entry, idx) => (
+                                    <li key={idx}>
+                                        <Typography variant="body2">
+                                            {entry.stepId === 'WORKFLOW_FINISHED'
+                                                ? `Workflow finished at ${new Date(entry.timestamp).toLocaleString()}`
+                                                : `Visited step ${entry.stepIndex + 1} (${selectedWorkflow.steps[entry.stepIndex].actor}: ${selectedWorkflow.steps[entry.stepIndex].description.slice(0, 40)}...) at ${new Date(entry.timestamp).toLocaleString()}`}
+                                        </Typography>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </Box>
                 </Box>
             )}
         </Box>
