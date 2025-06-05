@@ -22,6 +22,7 @@ export default function WorkflowWizard() {
     const [workflows, setWorkflows] = useState<Workflow[]>([]);
     const [selectedWorkflowId, setSelectedWorkflowId] = useState<string>('');
     const [currentStep, setCurrentStep] = useState(0);
+    const [finished, setFinished] = useState(false);
     const selectedWorkflow = workflows.find(w => w.id === selectedWorkflowId);
 
     useEffect(() => {
@@ -30,6 +31,7 @@ export default function WorkflowWizard() {
 
     useEffect(() => {
         setCurrentStep(0);
+        setFinished(false);
     }, [selectedWorkflowId]);
 
     return (
@@ -60,25 +62,45 @@ export default function WorkflowWizard() {
                             </Step>
                         ))}
                     </Stepper>
-                    <Box sx={{ p: 2, mb: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>{selectedWorkflow.steps[currentStep].actor}:</Typography>
-                        <Typography variant="body1">{selectedWorkflow.steps[currentStep].description}</Typography>
-                    </Box>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <Button
-                            variant="contained"
-                            onClick={() => setCurrentStep(s => Math.max(0, s - 1))}
-                            disabled={currentStep === 0}
-                        >Previous</Button>
-                        <Typography variant="body2" sx={{ alignSelf: 'center' }}>
-                            Step {currentStep + 1} of {selectedWorkflow.steps.length}
-                        </Typography>
-                        <Button
-                            variant="contained"
-                            onClick={() => setCurrentStep(s => Math.min(selectedWorkflow.steps.length - 1, s + 1))}
-                            disabled={currentStep === selectedWorkflow.steps.length - 1}
-                        >Next</Button>
-                    </Box>
+                    {!finished ? (
+                        <>
+                            <Box sx={{ p: 2, mb: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>{selectedWorkflow.steps[currentStep].actor}:</Typography>
+                                <Typography variant="body1">{selectedWorkflow.steps[currentStep].description}</Typography>
+                            </Box>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                <Button
+                                    variant="contained"
+                                    onClick={() => setCurrentStep(s => Math.max(0, s - 1))}
+                                    disabled={currentStep === 0}
+                                >Previous</Button>
+                                <Typography variant="body2" sx={{ alignSelf: 'center' }}>
+                                    Step {currentStep + 1} of {selectedWorkflow.steps.length}
+                                </Typography>
+                                {currentStep === selectedWorkflow.steps.length - 1 ? (
+                                    <Button
+                                        variant="contained"
+                                        color="success"
+                                        onClick={() => setFinished(true)}
+                                    >Finish</Button>
+                                ) : (
+                                    <Button
+                                        variant="contained"
+                                        onClick={() => setCurrentStep(s => Math.min(selectedWorkflow.steps.length - 1, s + 1))}
+                                    >Next</Button>
+                                )}
+                            </Box>
+                        </>
+                    ) : (
+                        <Box sx={{ mt: 4, textAlign: 'center' }}>
+                            <Typography variant="h5" color="success.main" gutterBottom>
+                                Workflow Complete!
+                            </Typography>
+                            <Typography variant="body1">
+                                You have finished all steps for this workflow.
+                            </Typography>
+                        </Box>
+                    )}
                 </Box>
             )}
         </Box>
