@@ -34,6 +34,23 @@ export default function WorkflowWizard() {
         setFinished(false);
     }, [selectedWorkflowId]);
 
+    const handleFinish = () => {
+        if (selectedWorkflow) {
+            const updatedWorkflows = workflows.map(w => {
+                if (w.id === selectedWorkflow.id) {
+                    const steps = w.steps.map((step, idx) =>
+                        idx === w.steps.length - 1 ? { ...step, completed: true, completedDate: new Date().toISOString() } : step
+                    );
+                    return { ...w, steps };
+                }
+                return w;
+            });
+            setWorkflows(updatedWorkflows);
+            setCurrentStep(selectedWorkflow.steps.length);
+        }
+        setFinished(true);
+    };
+
     return (
         <Box sx={{ maxWidth: 700, mx: 'auto', mt: 4, p: 3, bgcolor: 'background.paper', borderRadius: 2, boxShadow: 2 }}>
             <Typography variant="h4" gutterBottom>HR Workflow Wizard</Typography>
@@ -67,6 +84,11 @@ export default function WorkflowWizard() {
                             <Box sx={{ p: 2, mb: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
                                 <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>{selectedWorkflow.steps[currentStep].actor}:</Typography>
                                 <Typography variant="body1">{selectedWorkflow.steps[currentStep].description}</Typography>
+                                {currentStep === selectedWorkflow.steps.length - 1 && selectedWorkflow.steps[currentStep].completed && (
+                                    <Typography variant="body2" color="success.main" sx={{ mt: 1 }}>
+                                        Step marked as complete on {selectedWorkflow.steps[currentStep].completedDate ? new Date(selectedWorkflow.steps[currentStep].completedDate).toLocaleString() : ''}
+                                    </Typography>
+                                )}
                             </Box>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                 <Button
@@ -81,7 +103,7 @@ export default function WorkflowWizard() {
                                     <Button
                                         variant="contained"
                                         color="success"
-                                        onClick={() => setFinished(true)}
+                                        onClick={handleFinish}
                                     >Finish</Button>
                                 ) : (
                                     <Button
@@ -98,6 +120,9 @@ export default function WorkflowWizard() {
                             </Typography>
                             <Typography variant="body1">
                                 You have finished all steps for this workflow.
+                            </Typography>
+                            <Typography variant="body2" sx={{ mt: 1 }}>
+                                Completed on {new Date(selectedWorkflow.completedDate || new Date().toISOString()).toLocaleString()}
                             </Typography>
                         </Box>
                     )}
