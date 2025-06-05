@@ -16,11 +16,11 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import workflowDefinitions from './workflows.json'; // Assuming workflows.json is in the same directory
 
 // Helper to load workflows from JSON
-async function fetchWorkflows(): Promise<Workflow[]> {
-    const resp = await fetch('/src/workflows.json');
-    if (!resp.ok) throw new Error('Failed to load workflows');
-    return resp.json();
-}
+// async function fetchWorkflows(): Promise<Workflow[]> {
+//     const resp = await fetch('/src/workflows.json');
+//     if (!resp.ok) throw new Error('Failed to load workflows');
+//     return resp.json();
+// }
 
 // Case model
 interface CaseStep {
