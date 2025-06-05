@@ -13,14 +13,8 @@ import StepLabel from '@mui/material/StepLabel';
 import Switch from '@mui/material/Switch';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import workflowDefinitions from './workflows.json'; // Assuming workflows.json is in the same directory
-
-// Helper to load workflows from JSON
-// async function fetchWorkflows(): Promise<Workflow[]> {
-//     const resp = await fetch('/src/workflows.json');
-//     if (!resp.ok) throw new Error('Failed to load workflows');
-//     return resp.json();
-// }
+import useMediaQuery from '@mui/material/useMediaQuery';
+import workflowDefinitions from './workflows.json';
 
 // Case model
 interface CaseStep {
@@ -73,12 +67,11 @@ export default function WorkflowWizard() {
             },
         },
     });
+    const isMobile = useMediaQuery('(max-width:600px)');
     const selectedWorkflow = workflows.find(w => w.id === selectedWorkflowId);
     const activeCase = cases.find(c => c.id === activeCaseId);
 
     useEffect(() => {
-        // fetchWorkflows().then(setWorkflows).catch(() => setWorkflows([]));
-        // For simplicity, using static data from workflows.json
         setWorkflows(workflowDefinitions as Workflow[]);
     }, []);
 
@@ -191,14 +184,13 @@ export default function WorkflowWizard() {
                         <Typography variant="caption" gutterBottom sx={darkMode ? { color: '#fff' } : {}}>Case Id: {activeCase.id}</Typography>
                         <Typography variant="h5" gutterBottom sx={darkMode ? { color: '#fff' } : {}}>{selectedWorkflow.name}</Typography>
                         <Typography variant="body1" sx={{ mb: 2, ...(darkMode ? { color: '#fff' } : {}) }}>{selectedWorkflow.description}</Typography>
-                        <Stepper activeStep={currentStep} alternativeLabel sx={{ mb: 3 }}>
+                        <Stepper activeStep={currentStep} orientation={isMobile ? 'vertical' : 'horizontal'} alternativeLabel={!isMobile} sx={{ mb: 3 }}>
                             {selectedWorkflow.steps.map((step, idx) => (
                                 <Step key={step.id} completed={!!activeCase.steps[idx]?.completed}>
                                     <StepLabel>{step.actor}</StepLabel>
                                 </Step>
                             ))}
                         </Stepper>
-
                         {!finished ? (
                             <>
                                 <Box sx={{ p: 2, mb: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
