@@ -56,7 +56,7 @@ export default function WorkflowWizard() {
                     <Typography variant="h5" gutterBottom>{selectedWorkflow.name}</Typography>
                     <Typography variant="body1" sx={{ mb: 2 }}>{selectedWorkflow.description}</Typography>
                     <Stepper activeStep={currentStep} alternativeLabel sx={{ mb: 3 }}>
-                        {selectedWorkflow.steps.map((step, idx) => (
+                        {selectedWorkflow.steps.map((step) => (
                             <Step key={step.id}>
                                 <StepLabel>{step.actor}</StepLabel>
                             </Step>

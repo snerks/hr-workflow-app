@@ -47,5 +47,49 @@
                 "description": "Support return-to-work planning and ensure compliance with UK employment law."
             }
         ]
+    },
+    {
+        "id": "paternity-leave",
+        "name": "Paternity Leave",
+        "description": "Process for arranging paternity leave in compliance with UK law.",
+        "createdDate": "2025-06-05T09:00:00Z",
+        "dueDate": "2025-12-01T00:00:00Z",
+        "steps": [
+            {
+                "id": "notify-employer-paternity",
+                "actor": "Worker",
+                "description": "Notify employer of intention to take paternity leave, including expected week of childbirth/adoption, at least 15 weeks before the baby is due or within 7 days of being matched with a child for adoption."
+            },
+            {
+                "id": "provide-paternity-form",
+                "actor": "Worker",
+                "description": "Provide employer with a completed SC3 (birth) or SC4 (adoption) form as notice of paternity leave."
+            },
+            {
+                "id": "employer-acknowledge-paternity",
+                "actor": "Employer",
+                "description": "Acknowledge receipt of paternity leave notice and confirm leave dates in writing."
+            },
+            {
+                "id": "worker-confirm-dates",
+                "actor": "Worker",
+                "description": "Confirm chosen start date for paternity leave and discuss any flexible working requests."
+            },
+            {
+                "id": "employer-update-records-paternity",
+                "actor": "Employer",
+                "description": "Update HR records and payroll to reflect paternity leave and pay arrangements."
+            },
+            {
+                "id": "worker-take-leave",
+                "actor": "Worker",
+                "description": "Take paternity leave as agreed and keep in touch as necessary."
+            },
+            {
+                "id": "employer-support-return-paternity",
+                "actor": "Employer",
+                "description": "Support return-to-work planning and ensure compliance with UK employment law."
+            }
+        ]
     }
 ]
