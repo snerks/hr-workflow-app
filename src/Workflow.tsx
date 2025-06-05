@@ -13,6 +13,7 @@ import StepLabel from '@mui/material/StepLabel';
 import Switch from '@mui/material/Switch';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import workflowDefinitions from './workflows.json'; // Assuming workflows.json is in the same directory
 
 // Helper to load workflows from JSON
 async function fetchWorkflows(): Promise<Workflow[]> {
@@ -76,7 +77,9 @@ export default function WorkflowWizard() {
     const activeCase = cases.find(c => c.id === activeCaseId);
 
     useEffect(() => {
-        fetchWorkflows().then(setWorkflows).catch(() => setWorkflows([]));
+        // fetchWorkflows().then(setWorkflows).catch(() => setWorkflows([]));
+        // For simplicity, using static data from workflows.json
+        setWorkflows(workflowDefinitions as Workflow[]);
     }, []);
 
     useEffect(() => {
